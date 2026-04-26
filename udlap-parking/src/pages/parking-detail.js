@@ -1,5 +1,5 @@
 import { subscribeToSpots } from '../services/realtime.js';
-
+import { reserveSpot } from '../services/reservations.js';
 export function ParkingDetailPage(params = {}) {
   const parkingId = params.id;
 
@@ -44,12 +44,20 @@ function renderGrid(container, spots) {
   }).join('');
   
   container.querySelectorAll('.spot').forEach(el => {
-  el.addEventListener('click', () => {
-    const id = el.dataset.id;
-
-    console.log('Seleccionado:', id);
+    el.addEventListener('click', async () => {
+      const id = el.dataset.id;
+      // Evitar clicks en ocupados
+      if (el.classList.contains('spot-busy') || el.classList.contains('spot-reserved')) {
+        return;
+      }
+      try {
+        await reserveSpot(id, parkingId);
+        console.log('Reservado:', id);
+      } catch (err) {
+        alert(err.message);
+      }
+    });
   });
-});
 }
 
 function getClass(status) {
