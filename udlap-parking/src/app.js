@@ -1,4 +1,5 @@
 import { navigate, resolveRoute } from './router.js';
+import { login } from './services/auth.js';
 import { renderLayout, getTheme, applyTheme, toggleTheme } from './ui/layout.js';
 console.log("APP OK");
 
@@ -28,6 +29,9 @@ export function renderApp(root) {
       showNav: page.showNav !== false,
       navActive: page.navActive || route.navActive || 'home',
     });
+    if (page.onMount) {
+      page.onMount();
+    }
   };
 
   if (!listenersBound) {
@@ -56,15 +60,25 @@ export function renderApp(root) {
       }
     });
 
-    document.addEventListener('submit', (event) => {
+    // aqui empieza el listener del submit del login, que es el unico formulario que tenemos por ahora, asi que no hay necesidad de hacer algo mas complejo para identificarlo
+    document.addEventListener('submit', async (event) => {
       const form = event.target;
       if (!form.matches('[data-login-form]')) return;
 
       event.preventDefault();
-      localStorage.setItem('udlap.auth', '1');
-      navigate('/home', true);
-    });
 
+      const email = form.querySelector('input[type="email"]').value;
+      const password = form.querySelector('input[type="password"]').value;
+
+      try {
+        await login(email, password);
+        localStorage.setItem('udlap.auth', '1');
+        navigate('/home', true);
+      } catch (err) {
+        alert("Error de login: " + err.message);
+      }
+    });
+    // termina el listener del submit del login
     listenersBound = true;
   }
 

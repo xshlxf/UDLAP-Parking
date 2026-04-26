@@ -9,6 +9,6 @@ export function StaticPage({ title, subtitle, copy, navActive = 'home' }) {
         <h2>${title}</h2>
         <p class="muted">${copy}</p>
       </section>
-    `,
+    `
   };
 }

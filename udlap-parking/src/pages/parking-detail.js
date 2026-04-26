@@ -1,45 +1,54 @@
-import { PARKINGS } from '../data/parking.js';
+import { subscribeToSpots } from '../services/realtime.js';
 
 export function ParkingDetailPage(params = {}) {
-  const parking = PARKINGS.find((item) => item.id === params.id) || PARKINGS[0];
+  const parkingId = params.id;
 
   return {
-    title: parking.name,
-    subtitle: `Vista detalle de ${parking.id}`,
+    title: `Estacionamiento ${parkingId}`,
+    subtitle: 'Disponibilidad en tiempo real',
     navActive: 'parking',
     showNav: true,
+
     content: `
       <section class="stack">
         <a class="btn btn-ghost" data-link href="/parking">Volver</a>
 
         <section class="card">
-          <img src="${parking.image}" alt="${parking.name}" class="detail-photo" />
-          <div class="card-head">
-            <div>
-              <h2>${parking.name}</h2>
-              <p class="muted">${parking.subtitle}</p>
-            </div>
-            <span class="status">Fase 1</span>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h3>Vista previa del grid</h3>
-              <p class="muted">Esto después se reemplaza por el layout real de cajones.</p>
-            </div>
-            <span class="chip">Mock</span>
-          </div>
-
-          <div class="parking-grid">
-            ${Array.from({ length: 24 }, (_, index) => {
-              const busy = index % 5 === 0 || index % 9 === 0;
-              return `<div class="spot ${busy ? 'spot-busy' : 'spot-free'}">${index + 1}</div>`;
-            }).join('')}
-          </div>
+          <div id="grid" class="parking-grid"></div>
         </section>
       </section>
     `,
+
+    onMount: () => {
+      const grid = document.getElementById('grid');
+
+      subscribeToSpots(parkingId, (spots) => {
+        renderGrid(grid, spots);
+      });
+    }
   };
+}
+
+function renderGrid(container, spots) {
+  // Ordenar por ID (E2-001, E2-002...)
+  spots.sort((a, b) => a.id.localeCompare(b.id));
+
+  container.innerHTML = spots.map(spot => {
+    return `
+      <div 
+        class="spot ${getClass(spot.status)}" 
+        data-id="${spot.id}">
+        ${spot.id.split('-')[1]}
+      </div>
+    `;
+  }).join('');
+}
+
+function getClass(status) {
+  switch (status) {
+    case 'free': return 'spot-free';
+    case 'occupied': return 'spot-busy';
+    case 'reserved': return 'spot-reserved';
+    default: return '';
+  }
 }

@@ -30,6 +30,6 @@ export function LoginPage() {
           <a class="btn btn-ghost" data-link href="/home">Demo</a>
         </div>
       </section>
-    `,
+    `
   };
 }
