@@ -42,6 +42,7 @@ function renderGrid(container, spots) {
       </div>
     `;
   }).join('');
+  
   container.querySelectorAll('.spot').forEach(el => {
   el.addEventListener('click', () => {
     const id = el.dataset.id;

@@ -13,8 +13,8 @@ export function HomePage() {
         <div class="map-stage">
           <img src="/assets/mapaUDLAP.png" />
 
-          <div id="pin-E2" class="map-pin">E2</div>
-          <div id="pin-E5" class="map-pin">E5</div>
+          <a id="pin-E2" class="map-pin" data-link href="/parking/E2">E2</a>
+          <a id="pin-E5" class="map-pin" data-link href="/parking/E5">E5</a>
         </div>
       </section>
     `,
